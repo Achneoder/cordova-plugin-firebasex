@@ -358,5 +358,11 @@ export interface FirebasePlugin {
         error: (err: string) => void,
         listenerId: string
     ): void
+    listAllFilesInBucket(
+        success: (files: Array<string>) => void,
+        error: (err: string) => void,
+        bucket: string,
+        prefix?: string
+    ): void
 }
 declare var FirebasePlugin: FirebasePlugin;

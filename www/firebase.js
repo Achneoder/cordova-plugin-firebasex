@@ -459,3 +459,7 @@ exports.registerInstallationIdChangeListener = function(fn){
     if(typeof fn !== "function") throw "The specified argument must be a function";
     onInstallationIdChangeCallback = fn;
 };
+
+exports.listAllFilesInBucket = function (success, error, bucket, prefix) {
+    exec(success, error, "FirebasePlugin", "listAllFilesInBucket", [bucket, prefix]);
+};

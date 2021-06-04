@@ -74,6 +74,10 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.perf.metrics.Trace;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.ListResult;
 
 
 import org.apache.cordova.CallbackContext;
@@ -182,7 +186,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-                    firestore = FirebaseFirestore.getInstance();                  
+                    firestore = FirebaseFirestore.getInstance();
                     functions = FirebaseFunctions.getInstance();
 
                     gson = new GsonBuilder()
@@ -390,6 +394,8 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.getInstallationId(args, callbackContext);
             } else if (action.equals("getInstallationToken")) {
                 this.getInstallationToken(args, callbackContext);
+            } else if (action.equals("listAllFilesInBucket")) {
+                this.listAllFilesInBucket(args, callbackContext);
             } else{
                 callbackContext.error("Invalid action: " + action);
                 return false;
@@ -3041,5 +3047,55 @@ public class FirebasePlugin extends CordovaPlugin {
 
     private int conformBooleanForPluginResult(boolean result){
         return result ? 1 : 0;
+    }
+
+    public void listAllFilesInBucket(JSONArray args, final CallbackContext callbackContext){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    final String bucket = args.getString(0);
+                    final FirebaseStorage storage;
+                    if(bucket != null && !bucket.startsWith("gs://")) {
+                         storage = FirebaseStorage.getInstance("gs://" + bucket);
+                    } else if(bucket != null) {
+                        storage = FirebaseStorage.getInstance(bucket);
+                    } else {
+                        storage = FirebaseStorage.getInstance();
+                    }
+
+                    final StorageReference ref;
+
+                    if(args.length() == 2) {
+                        ref = storage.getReference().child(args.getString(1));
+                    } else {
+                        ref = storage.getReference();
+                    }
+                    ref.listAll()
+                        .addOnSuccessListener(new OnSuccessListener<ListResult>() {
+                            @Override
+                            public void onSuccess(ListResult listResult) {
+                                try {
+                                    JSONArray files = new JSONArray();
+                                    for (StorageReference item : listResult.getItems()) {
+                                        files.put(item.getPath());
+                                    }
+                                    callbackContext.success(files);
+                                } catch(Exception e) {
+                                    handleExceptionWithContext(e, callbackContext);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Uh-oh, an error occurred!
+                                handleExceptionWithContext(e, callbackContext);
+                            }
+                        });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
     }
 }
