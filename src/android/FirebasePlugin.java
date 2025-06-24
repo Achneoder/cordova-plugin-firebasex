@@ -4292,35 +4292,35 @@ public class FirebasePlugin extends CordovaPlugin {
      * @param permissions  - list of permissions that were requested
      * @param grantResults - list of flags indicating if above permissions were granted or denied
      */
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        String sRequestId = String.valueOf(requestCode);
-        Log.v(TAG, "Received result for permissions request id=" + sRequestId);
-        try {
-            if (postNotificationPermissionRequestCallbackContext == null) {
-                Log.e(TAG, "No callback context found for permissions request id=" + sRequestId);
-                return;
-            }
+    // public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+    //     String sRequestId = String.valueOf(requestCode);
+    //     Log.v(TAG, "Received result for permissions request id=" + sRequestId);
+    //     try {
+    //         if (postNotificationPermissionRequestCallbackContext == null) {
+    //             Log.e(TAG, "No callback context found for permissions request id=" + sRequestId);
+    //             return;
+    //         }
 
-            boolean postNotificationPermissionGranted = false;
-            for (int i = 0, len = permissions.length; i < len; i++) {
-                String androidPermission = permissions[i];
+    //         boolean postNotificationPermissionGranted = false;
+    //         for (int i = 0, len = permissions.length; i < len; i++) {
+    //             String androidPermission = permissions[i];
 
-                if (androidPermission.equals(qualifyPermission(POST_NOTIFICATIONS))) {
-                    postNotificationPermissionGranted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
-                }
-            }
+    //             if (androidPermission.equals(qualifyPermission(POST_NOTIFICATIONS))) {
+    //                 postNotificationPermissionGranted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+    //             }
+    //         }
 
-            postNotificationPermissionRequestCallbackContext.success(postNotificationPermissionGranted ? 1 : 0);
-            postNotificationPermissionRequestCallbackContext = null;
+    //         postNotificationPermissionRequestCallbackContext.success(postNotificationPermissionGranted ? 1 : 0);
+    //         postNotificationPermissionRequestCallbackContext = null;
 
-        } catch (Exception e) {
-            if (postNotificationPermissionRequestCallbackContext != null) {
-                handleExceptionWithContext(e, postNotificationPermissionRequestCallbackContext);
-            } else {
-                handleExceptionWithoutContext(e);
-            }
-        }
-    }
+    //     } catch (Exception e) {
+    //         if (postNotificationPermissionRequestCallbackContext != null) {
+    //             handleExceptionWithContext(e, postNotificationPermissionRequestCallbackContext);
+    //         } else {
+    //             handleExceptionWithoutContext(e);
+    //         }
+    //     }
+    // }
 
     private boolean isUserSignedIn() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
