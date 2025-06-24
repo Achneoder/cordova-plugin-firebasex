@@ -4279,7 +4279,8 @@ public class FirebasePlugin extends CordovaPlugin {
                     handleExceptionWithContext(e, callbackContext);
                 }
             }
-    });
+        });
+    }
 
     /************
      * Overrides
@@ -4322,7 +4323,7 @@ public class FirebasePlugin extends CordovaPlugin {
     //     }
     // }
 
-    private boolean isUserSignedIn() {
+    private boolean isUserSignedInHelper() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         return user != null;
     }
